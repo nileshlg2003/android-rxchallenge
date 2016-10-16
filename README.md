@@ -18,8 +18,8 @@ In order to be considered for the Android position, you must complete the follow
 
 ## Task
 
-1. Fork this repository
-2. Create a *source* folder to contain your code. 
+1. Fork this repository and create a new branch which is NOT master.
+2. Create a *source* folder in this new branch to contain your code in. 
 3. In the *source* directory, please create an Android app that accomplishes the following:
 	- Connect to the [Star Wars API](https://swapi.co/)
 	- Find the 15 most expensive starships from the first 4 pages. 
