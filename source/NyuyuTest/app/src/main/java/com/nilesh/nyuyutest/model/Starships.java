@@ -1,4 +1,4 @@
-package com.nilesh.nyuyutest.network;
+package com.nilesh.nyuyutest.model;
 
 import java.util.ArrayList;
 import java.util.HashMap;

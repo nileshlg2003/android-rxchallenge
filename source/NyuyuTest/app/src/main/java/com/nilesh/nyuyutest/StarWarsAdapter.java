@@ -7,7 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import com.nilesh.nyuyutest.network.RecyclerShip;
+import com.nilesh.nyuyutest.model.RecyclerShip;
 import java.util.List;
 
 /**

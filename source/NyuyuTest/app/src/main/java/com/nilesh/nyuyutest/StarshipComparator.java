@@ -1,8 +1,8 @@
 package com.nilesh.nyuyutest;
 
 import android.text.TextUtils;
-import com.nilesh.nyuyutest.network.RecyclerShip;
-import com.nilesh.nyuyutest.network.Starships;
+import com.nilesh.nyuyutest.model.RecyclerShip;
+import com.nilesh.nyuyutest.model.Starships;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;

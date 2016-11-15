@@ -1,5 +1,6 @@
 package com.nilesh.nyuyutest.network;
 
+import com.nilesh.nyuyutest.model.finalOutput;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;

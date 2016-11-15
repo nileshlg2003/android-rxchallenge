@@ -1,4 +1,4 @@
-package com.nilesh.nyuyutest.network;
+package com.nilesh.nyuyutest.model;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;

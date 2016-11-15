@@ -1,5 +1,7 @@
 package com.nilesh.nyuyutest.network;
 
+import com.nilesh.nyuyutest.model.Film;
+import com.nilesh.nyuyutest.model.finalOutput;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
 import retrofit2.http.Url;

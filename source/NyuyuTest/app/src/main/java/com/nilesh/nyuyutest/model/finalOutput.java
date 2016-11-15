@@ -1,4 +1,4 @@
-package com.nilesh.nyuyutest.network;
+package com.nilesh.nyuyutest.model;
 
 import android.support.annotation.Nullable;
 import com.google.gson.annotations.Expose;
