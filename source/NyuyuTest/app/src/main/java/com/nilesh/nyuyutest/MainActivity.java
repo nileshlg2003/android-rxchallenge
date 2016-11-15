@@ -9,10 +9,13 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
+import com.nilesh.nyuyutest.network.Apicall;
 import com.nilesh.nyuyutest.network.Film;
+import com.nilesh.nyuyutest.network.RecyclerShip;
 import com.nilesh.nyuyutest.network.StarWarsAPI;
 import com.nilesh.nyuyutest.network.StarWarsClient;
 import com.nilesh.nyuyutest.network.Starships;
+import com.nilesh.nyuyutest.network.finalOutput;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -34,9 +37,12 @@ public class MainActivity extends AppCompatActivity {
   StarWarsAdapter starWarsAdapter;
   rx.Subscription subscription;
 
+  private StarWarsAdapter mAdapter;
+
   private final Map<String, String> mAllFilmURLsMap = new HashMap<>();
   private final List<Starships> mAllShips = new ArrayList<>();
   private final List<String> mApiCallLog = new ArrayList<>();
+  private ArrayList <RecyclerShip> mAllRecyclerShips = new ArrayList<>();
 
 
 
@@ -45,9 +51,27 @@ public class MainActivity extends AppCompatActivity {
     setContentView(R.layout.activity_main);
 
 
+    mContext = getApplicationContext();
     setupViews();
-    setupRecyclerView();
-    downloadData();
+
+    recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+
+    //Log.d(TAG, "onCreate: " + savedInstanceState.containsKey("key"));
+    if (savedInstanceState != null && savedInstanceState.containsKey("key")) {
+      Log.d(TAG, "onCreate: coming ere");
+      recyclerView.setLayoutManager(new LinearLayoutManager(this));
+     // mAllRecyclerShips = savedInstanceState.getParcelableArrayList("key");
+      //categories =  getArguments().getParcelableArrayList("list_categories");
+      mAllRecyclerShips = savedInstanceState.getParcelableArrayList("key");
+      Log.d(TAG, "onCreate: " + mAllRecyclerShips);
+      assert mAllRecyclerShips != null;
+      mAdapter = new StarWarsAdapter(mContext, mAllRecyclerShips.subList(0,15));
+      recyclerView.setAdapter(starWarsAdapter);
+    }else {
+
+      downloadData();
+    }
 
   }
 
@@ -58,73 +82,38 @@ public class MainActivity extends AppCompatActivity {
 
   private void setupRecyclerView() {
     recyclerView.setLayoutManager(new LinearLayoutManager(this));
-    starWarsAdapter = new StarWarsAdapter(new ArrayList<Starships>());
-    recyclerView.setAdapter(starWarsAdapter);
+    //starWarsAdapter = new StarWarsAdapter(new ArrayList<Starships>());
+    //starWarsAdapter = new StarWarsAdapter(mContext, new ArrayList<RecyclerShip>());
+
   }
 
   private void downloadData() {
-    Log.d(TAG, "downloadData1 ");
+    Log.d(TAG, "downloadData ");
     showProgressBar();
 
-    subscription = Observable.range(1, 10).flatMap(new Func1<Integer, Observable<Starships>>() {
-      @Override
-      public Observable<Starships> call(Integer characterId) {
-        return StarWarsClient.getRxApi().getRxStarshipsByID(characterId).onErrorResumeNext(new Func1<Throwable, Observable<? extends Starships>>() {
+    new Apicall(StarWarsClient.getRxApi())
+
+        .getAllStarships(1)
+        .concatMap(new Func1<finalOutput, Observable<Starships>>() {
           @Override
-
-          public Observable<? extends Starships> call(Throwable throwable) {
-            return Observable.empty();
+          public Observable<Starships> call(finalOutput result) {
+            return Observable.from(result.getShips());
           }
-        });
-      }
-    }).subscribeOn(Schedulers.io())
+        })
+
+        .subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
-
-        //.toSortedList(MainActivity::compareModel)
-
-           /* .toSortedList(new Func2<Starships, Starships, Integer>() {
-
-
-              @Override
-              public Integer call(Starships starships, Starships starships2) {
-                Log.d(TAG, "call: " + starships.getCostInCredits());
-                return starships.getCostInCredits().compareTo(starships2.getCostInCredits());
-              }
-            })*/
-            /*.toSortedList((starships, starships2) -> {
-
-              return starships.getCostInCredits().compareTo(starships2.getCostInCredits());
-              //return null;
-            })*/
-
-           /* .subscribe(new Subscriber<List<Starships>>() {
-                @Override public void onCompleted() {
-                    starWarsAdapter.notifyItemRangeChanged(0, starWarsAdapter.getItemCount());
-                    hideProgressBar();
-                }
-
-                @Override public void onError(Throwable e) {
-
-                    Log.e(TAG, "onError " + e.getMessage());
-                    e.printStackTrace();
-                    hideProgressBar();
-                    Toast.makeText(RxJavaActivity.this, "Cannot download data", Toast.LENGTH_SHORT).show();
-
-                }
-
-                @Override public void onNext(List<Starships> starshipses) {
-
-                    starWarsAdapter.dataSet.add((Starships) starshipses);
-                  //starWarsAdapter.dataSet.add(starshipses);
-                }*/
-
 
         .subscribe(new Subscriber<Starships>()  {
           @Override
           public void onCompleted() {
-
-            starWarsAdapter.notifyItemRangeChanged(0, starWarsAdapter.getItemCount());
+            mAllRecyclerShips = StarshipComparator.populateRecyclerShipList(mAllShips, mAllFilmURLsMap, mAllRecyclerShips);
+            mAllRecyclerShips = StarshipComparator.sortList(mAllRecyclerShips);
+            Log.d(TAG, "onCompleted: " + mAllRecyclerShips);
+            recyclerView.setVisibility(View.VISIBLE);
             hideProgressBar();
+            mAdapter = new StarWarsAdapter(mContext, mAllRecyclerShips.subList(0,15));
+            recyclerView.setAdapter(mAdapter);
           }
 
           @Override
@@ -138,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
 
 
           @Override public void onNext(Starships starshipses) {
-            starWarsAdapter.dataSet.add((Starships) starshipses);
+
             for (String film: starshipses.getFilms()) {
 
 
@@ -148,16 +137,10 @@ public class MainActivity extends AppCompatActivity {
               }
             }
            mAllShips.add(starshipses);
+            //starWarsAdapter.dataSet.add( mAllShips);
+
           }
 
-
-
-
-
-          /*@Override
-            public void onNext(StarWarsCharacter starWarsCharacter) {
-                starWarsAdapter.dataSet.add(starWarsCharacter);
-            }*/
         });
   }
 
@@ -203,5 +186,11 @@ public class MainActivity extends AppCompatActivity {
   protected void onDestroy() {
     if (subscription != null) subscription.unsubscribe();
     super.onDestroy();
+  }
+
+  protected void onSaveInstanceState(Bundle outState) {
+    if (recyclerView.getAdapter() != null)
+      outState.putParcelableArrayList("key", mAllRecyclerShips);
+    super.onSaveInstanceState(outState);
   }
 }

@@ -17,7 +17,7 @@ public interface StarWarsAPI {
   rx.Observable<Starships> getRxStarshipsByID(@Path("id") int id);*/
 
   @GET("starships/")
-  Observable<Starships> getRxStarshipsByID(@Query("page") int page);
+  Observable<finalOutput> getRxStarshipsByID(@Query("page") int page);
 
   @GET Observable<Film> getFilmByURL(@Url String url);
 }
